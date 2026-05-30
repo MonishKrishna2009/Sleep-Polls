@@ -25,13 +25,6 @@ import org.amethystdev.database.DatabaseManager;
 import org.amethystdev.database.MariaDBDatabaseManager;
 import org.amethystdev.database.SQLiteDatabaseManager;
 import org.amethystdev.model.PlayerData;
-import org.amethystdev.network.dragonfly.DragonflyManager;
-import org.amethystdev.network.dragonfly.DragonflyPacketBridge;
-import org.amethystdev.network.dragonfly.DragonflySubscriber;
-import org.amethystdev.network.packet.PacketType;
-import org.amethystdev.network.packet.handler.PacketHandlerRegistry;
-import org.amethystdev.network.packet.handler.PollStartPacketHandler;
-import org.amethystdev.network.packet.handler.PollVotePacketHandler;
 import org.amethystdev.repository.PlayerDataRepository;
 import org.amethystdev.sleep.SleepListener;
 import org.amethystdev.sleep.SleepPollManager;
@@ -47,19 +40,6 @@ public final class Main extends JavaPlugin {
     private DatabaseManager databaseManager;
 
     private PlayerDataRepository playerDataRepository;
-
-    /*
-     * Dragonfly
-     */
-    private DragonflyManager dragonflyManager;
-
-    private DragonflySubscriber dragonflySubscriber;
-
-    /*
-     * Packet handlers
-     */
-    private PacketHandlerRegistry
-            packetHandlerRegistry;
 
     @Override
     public void onEnable() {
@@ -127,43 +107,6 @@ public final class Main extends JavaPlugin {
                 new SleepPollManager(this);
 
         /*
-         * Packet registry
-         */
-        this.packetHandlerRegistry =
-                new PacketHandlerRegistry();
-
-        packetHandlerRegistry.register(
-                PacketType.POLL_START,
-                new PollStartPacketHandler(this)
-        );
-
-        packetHandlerRegistry.register(
-                PacketType.POLL_VOTE,
-                new PollVotePacketHandler(this)
-        );
-
-        /*
-         * Dragonfly
-         */
-        this.dragonflyManager =
-                new DragonflyManager(this);
-
-        dragonflyManager.connect();
-
-        this.dragonflySubscriber =
-                new DragonflySubscriber(
-                        this,
-                        dragonflyManager,
-                        packetHandlerRegistry
-                );
-
-        dragonflySubscriber.subscribe();
-
-        DragonflyPacketBridge.initialize(
-                dragonflyManager
-        );
-
-        /*
          * Events
          */
         getServer()
@@ -197,22 +140,6 @@ public final class Main extends JavaPlugin {
 
         DatabaseExecutor.shutdown();
 
-        /*
-         * Dragonfly shutdown
-         */
-        if (dragonflySubscriber != null) {
-
-            dragonflySubscriber.disconnect();
-        }
-
-        if (dragonflyManager != null) {
-
-            dragonflyManager.disconnect();
-        }
-
-        /*
-         * Database shutdown
-         */
         if (databaseManager != null) {
 
             databaseManager.disconnect();
@@ -237,18 +164,6 @@ public final class Main extends JavaPlugin {
     getPlayerDataRepository() {
 
         return playerDataRepository;
-    }
-
-    public DragonflyManager
-    getDragonflyManager() {
-
-        return dragonflyManager;
-    }
-
-    public PacketHandlerRegistry
-    getPacketHandlerRegistry() {
-
-        return packetHandlerRegistry;
     }
 
     public boolean hasBossBarEnabled(
@@ -350,43 +265,18 @@ public final class Main extends JavaPlugin {
                 "Reloading Sleep-Polls..."
         );
 
-        /*
-         * Clear caches
-         */
         if (playerDataRepository != null) {
 
             playerDataRepository.clearCache();
         }
 
-        /*
-         * Disconnect Dragonfly
-         */
-        if (dragonflySubscriber != null) {
-
-            dragonflySubscriber.disconnect();
-        }
-
-        if (dragonflyManager != null) {
-
-            dragonflyManager.disconnect();
-        }
-
-        /*
-         * Disconnect database
-         */
         if (databaseManager != null) {
 
             databaseManager.disconnect();
         }
 
-        /*
-         * Reload config
-         */
         reloadConfig();
 
-        /*
-         * Recreate database manager
-         */
         String databaseType =
                 getConfig().getString(
                         "database.type",
@@ -406,62 +296,16 @@ public final class Main extends JavaPlugin {
                     new SQLiteDatabaseManager(this);
         }
 
-        /*
-         * Reconnect database
-         */
         databaseManager.connect();
 
-        /*
-         * Recreate repository
-         */
         this.playerDataRepository =
                 new PlayerDataRepository(
                         databaseManager
                 );
 
-        /*
-         * Run migrations
-         */
         new DatabaseInitializer(
                 databaseManager
         ).initialize();
-
-        /*
-         * Recreate packet registry
-         */
-        this.packetHandlerRegistry =
-                new PacketHandlerRegistry();
-
-        packetHandlerRegistry.register(
-                PacketType.POLL_START,
-                new PollStartPacketHandler(this)
-        );
-
-        packetHandlerRegistry.register(
-                PacketType.POLL_VOTE,
-                new PollVotePacketHandler(this)
-        );
-
-        /*
-         * Reconnect Dragonfly
-         */
-        this.dragonflyManager =
-                new DragonflyManager(this);
-
-        dragonflyManager.connect();
-
-        this.dragonflySubscriber =
-                new DragonflySubscriber(
-                        this,
-                        dragonflyManager,
-                        packetHandlerRegistry
-                );
-
-        dragonflySubscriber.subscribe();
-
-        DragonflyPacketBridge.initialize(
-                dragonflyManager
-        );
 
         getLogger().info(
                 "Sleep-Polls reload complete."

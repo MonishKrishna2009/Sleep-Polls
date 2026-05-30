@@ -46,7 +46,6 @@ dependencies {
     val lettuceVersion = "7.6.0.RELEASE"
 
     implementation("io.github.revxrsal:lamp.common:$lampVersion")
-    implementation("io.lettuce:lettuce-core:$lettuceVersion")
     implementation("io.github.revxrsal:lamp.bukkit:$lampVersion")
     implementation("com.zaxxer:HikariCP:$HikariCPVersion")
     implementation("com.google.code.gson:gson:$gsonVersion")

@@ -8,10 +8,6 @@ import java.util.UUID;
 
 import org.amethystdev.Main;
 import org.amethystdev.model.PlayerData;
-import org.amethystdev.sleep.event.PollEventBus;
-import org.amethystdev.sleep.event.PollFinishEvent;
-import org.amethystdev.sleep.event.PollStartEvent;
-import org.amethystdev.sleep.event.PollVoteEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.boss.BarColor;
@@ -88,13 +84,6 @@ public final class SleepPollManager {
         polls.put(
                 worldName,
                 poll
-        );
-
-        /*
-         * Fire start event
-         */
-        PollEventBus.fire(
-                new PollStartEvent(poll)
         );
 
         startPollLifecycle(poll);
@@ -375,17 +364,6 @@ public final class SleepPollManager {
                 accept
         );
 
-        /*
-         * Fire vote event
-         */
-        PollEventBus.fire(
-                new PollVoteEvent(
-                        poll,
-                        player.getUniqueId(),
-                        accept
-                )
-        );
-
         PlayerData data =
                 ((Main) plugin)
                         .getPlayerDataRepository()
@@ -461,16 +439,6 @@ public final class SleepPollManager {
                 succeeded
                         ? PollState.SUCCEEDED
                         : PollState.FAILED
-        );
-
-        /*
-         * Fire finish event
-         */
-        PollEventBus.fire(
-                new PollFinishEvent(
-                        poll,
-                        succeeded
-                )
         );
 
         BukkitTask task =
@@ -717,38 +685,4 @@ public final class SleepPollManager {
             p.sendActionBar(actionBar);
         }
     }
-	public Poll createRemotePoll(
-			String world,
-			Set<UUID> eligible,
-			int durationSeconds,
-			int requiredPercentage
-	) {
-
-		if (isPollActive(world)) {
-
-			return polls.get(world);
-		}
-
-		Poll poll =
-				new Poll(
-						world,
-						eligible,
-						durationSeconds,
-						requiredPercentage
-				);
-
-		polls.put(
-				world,
-				poll
-		);
-
-		startPollLifecycle(poll);
-
-		plugin.getLogger().info(
-				"Created remote poll: "
-						+ world
-		);
-
-		return poll;
-	}
 }

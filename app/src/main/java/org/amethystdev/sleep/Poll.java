@@ -8,43 +8,22 @@ public final class Poll {
 
     private final String world;
 
-    /*
-     * All eligible voters
-     */
     private final Set<UUID> eligible =
             new HashSet<>();
 
-    /*
-     * YES votes
-     */
     private final Set<UUID> yesVotes =
             new HashSet<>();
 
-    /*
-     * NO votes
-     */
     private final Set<UUID> noVotes =
             new HashSet<>();
 
-    /*
-     * Poll creation timestamp
-     */
     private final long createdAt;
 
-    /*
-     * Current poll state
-     */
     private PollState state =
             PollState.ACTIVE;
 
-    /*
-     * Remaining duration
-     */
     private int remainingSeconds;
 
-    /*
-     * Required vote percentage
-     */
     private final int requiredPercentage;
 
     public Poll(
@@ -70,9 +49,6 @@ public final class Poll {
                 System.currentTimeMillis();
     }
 
-    /*
-     * Register vote
-     */
     public synchronized void vote(
             UUID uuid,
             boolean yes
@@ -92,18 +68,12 @@ public final class Poll {
         }
     }
 
-    /*
-     * Has poll passed?
-     */
     public synchronized boolean hasPassed() {
 
         return yesVotes.size()
                 >= getNeededVotes();
     }
 
-    /*
-     * Can poll still mathematically pass?
-     */
     public synchronized boolean canStillPass() {
 
         int remaining =
@@ -118,9 +88,6 @@ public final class Poll {
                 >= getNeededVotes();
     }
 
-    /*
-     * Needed YES votes
-     */
     public int getNeededVotes() {
 
         return (int) Math.ceil(
@@ -132,57 +99,36 @@ public final class Poll {
         );
     }
 
-    /*
-     * Decrement timer
-     */
     public void decrementTimer() {
 
         remainingSeconds--;
     }
 
-    /*
-     * World
-     */
     public String getWorld() {
 
         return world;
     }
 
-    /*
-     * Eligible players
-     */
     public Set<UUID> getEligible() {
 
         return eligible;
     }
 
-    /*
-     * YES votes
-     */
     public Set<UUID> getYesVotes() {
 
         return yesVotes;
     }
 
-    /*
-     * NO votes
-     */
     public Set<UUID> getNoVotes() {
 
         return noVotes;
     }
 
-    /*
-     * Creation timestamp
-     */
     public long getCreatedAt() {
 
         return createdAt;
     }
 
-    /*
-     * Poll state
-     */
     public PollState getState() {
 
         return state;
@@ -195,9 +141,6 @@ public final class Poll {
         this.state = state;
     }
 
-    /*
-     * Remaining seconds
-     */
     public int getRemainingSeconds() {
 
         return remainingSeconds;
@@ -211,17 +154,11 @@ public final class Poll {
                 remainingSeconds;
     }
 
-    /*
-     * Required vote percentage
-     */
     public int getRequiredPercentage() {
 
         return requiredPercentage;
     }
 
-    /*
-     * Vote counts
-     */
     public int getYesVoteCount() {
 
         return yesVotes.size();
@@ -237,9 +174,6 @@ public final class Poll {
         return eligible.size();
     }
 
-    /*
-     * Poll participation
-     */
     public boolean hasVoted(
             UUID uuid
     ) {
@@ -262,9 +196,6 @@ public final class Poll {
         return noVotes.contains(uuid);
     }
 
-    /*
-     * Remaining possible votes
-     */
     public int getRemainingPossibleVotes() {
 
         return eligible.size()
@@ -274,9 +205,6 @@ public final class Poll {
         );
     }
 
-    /*
-     * Vote percentage
-     */
     public double getYesPercentage() {
 
         if (eligible.isEmpty()) {
@@ -289,38 +217,14 @@ public final class Poll {
         ) * 100.0;
     }
 
-    /*
-     * Expired?
-     */
     public boolean isExpired() {
 
         return remainingSeconds <= 0;
     }
 
-    /*
-     * Active?
-     */
     public boolean isActive() {
 
         return state
                 == PollState.ACTIVE;
-    }
-    public void applyRemoteVote(
-            UUID player,
-            boolean vote
-    ) {
-
-        yesVotes.remove(player);
-
-        noVotes.remove(player);
-
-        if (vote) {
-
-            yesVotes.add(player);
-
-        } else {
-
-            noVotes.add(player);
-        }
     }
 }
