@@ -21,7 +21,6 @@
 #
 # ============================================================
 
-
 # ------------------------------------------------------------
 # Poll Settings
 # ------------------------------------------------------------
@@ -103,6 +102,24 @@ worlds:
     - lobby
     - minigames
 
+
+# ------------------------------------------------------------
+# Database Settings
+# ------------------------------------------------------------
+database:
+
+  type: SQLITE # Options: SQLITE, MARIADB (not MYSQL)
+
+  sqlite:
+    file: data.db
+
+  mariadb:
+    host: localhost
+    port: 3306
+    database: sleeppolls
+    username: root
+    password: password
+    pool-size: 10
 
 # ============================================================
 # End of configuration

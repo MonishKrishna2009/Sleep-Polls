@@ -15,7 +15,7 @@ plugins {
 }
 
 group = "org.amethystdev"
-version = "1.0.0"
+version = "2.0.0"
 
 repositories {
 
@@ -38,10 +38,21 @@ dependencies {
 
     // Lamp command framework
     val lampVersion = "4.0.0-rc.12"
+    val HikariCPVersion = "7.0.2"
+    val gsonVersion = "2.14.0"
+    val mariadbVersion = "3.5.3"
+    val sqliteVersion = "3.53.1.0"
+    val EssentialsXVersion = "2.21.2"
+    val lettuceVersion = "7.6.0.RELEASE"
 
     implementation("io.github.revxrsal:lamp.common:$lampVersion")
     implementation("io.github.revxrsal:lamp.bukkit:$lampVersion")
-    compileOnly("net.essentialsx:EssentialsX:2.21.1") {
+    implementation("com.zaxxer:HikariCP:$HikariCPVersion")
+    implementation("com.google.code.gson:gson:$gsonVersion")
+    implementation("org.mariadb.jdbc:mariadb-java-client:$mariadbVersion")
+    implementation("org.xerial:sqlite-jdbc:$sqliteVersion")
+
+    compileOnly("net.essentialsx:EssentialsX:$EssentialsXVersion") {
         isTransitive = false
     }
 }
@@ -114,7 +125,7 @@ tasks {
             modrinth("worldedit", "k9KdTr1M")
 
             // LuckPerms
-            url("https://download.luckperms.net/1631/bukkit/loader/LuckPerms-Bukkit-5.5.42.jar")
+            url("https://download.luckperms.net/1641/bukkit/loader/LuckPerms-Bukkit-5.5.53.jar")
 
             // MiniPlaceholders
             modrinth("miniplaceholders", "N2WfJ0ll")

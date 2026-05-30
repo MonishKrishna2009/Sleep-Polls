@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.amethystdev.Main;
+import org.amethystdev.model.PlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.World;
@@ -61,7 +62,9 @@ public final class SleepListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerBedEnter(PlayerBedEnterEvent event) {
+    public void onPlayerBedEnter(
+            PlayerBedEnterEvent event
+    ) {
 
         // Bed entry failed
         if (event.getBedEnterResult()
@@ -69,21 +72,26 @@ public final class SleepListener implements Listener {
             return;
         }
 
-        Player sleeper = event.getPlayer();
+        Player sleeper =
+                event.getPlayer();
 
-        World world = sleeper.getWorld();
+        World world =
+                sleeper.getWorld();
 
-        String worldName = world.getName();
+        String worldName =
+                world.getName();
 
         // Ignore blacklisted worlds
         if (plugin.isWorldBlocked(worldName)) {
             return;
         }
 
-        long time = world.getTime();
+        long time =
+                world.getTime();
 
         // Only allow at night
-        if (time < 13000 || time > 23000) {
+        if (time < 13000
+                || time > 23000) {
 
             sleeper.sendMessage(
                     PREFIX.append(
@@ -180,12 +188,30 @@ public final class SleepListener implements Listener {
                 worldName,
                 voters
         );
+
+        // Track statistics
+        PlayerData data =
+                plugin.getPlayerDataRepository()
+                        .getOrCreatePlayer(
+                                sleeper.getUniqueId()
+                        );
+
+        if (data != null) {
+
+            data.incrementPollsStarted();
+
+            plugin.getPlayerDataRepository()
+                    .savePlayer(data);
+        }
     }
 
-    private boolean isAfk(Player player) {
+    private boolean isAfk(
+            Player player
+    ) {
 
         if (Bukkit.getPluginManager()
                 .getPlugin("Essentials") == null) {
+
             return false;
         }
 
